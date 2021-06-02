@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "elemancy",
+	"version": "${version}",
+	"name": "Elemancy",
+	"description": "Bend the power of the elements to your will with a ... bell?!",
+	"authors": [
+		"Fulmineo"
+	],
+	"contributors": [],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/elemancy",
+		"sources": "https://github.com/Fulmineo64/Elemancy",
+		"issues": "https://github.com/Fulmineo64/Elemancy/issues"
+	},
+	"license": "https://github.com/Fulmineo64/Elemancy/blob/master/LICENSE",
+	"icon": "assets/elemancy/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.fulmineo.elemancy.Elemancy"
+		],
+		"client": [
+			"dev.fulmineo.elemancy.ElemancyClient"
+		],
+		"server": []
+	},
+	"mixins": [
+		"elemancy.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.11.3",
+		"minecraft": "1.17.x",
+		"java": ">=16"
+	}
+}
