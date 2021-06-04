@@ -4,30 +4,50 @@ import net.minecraft.block.enums.Instrument;
 import net.minecraft.nbt.NbtCompound;
 
 public class Note {
-	private int executionIndex;
+	private int delayTicks;
 	private int pitchIndex;
-	private int rowIndex;
-	private Instrument instrument;
+	// TODO: Replace the various properties with this one!
+	// private NoteAction action;
+	private Integer songIndex;
 	private Element element;
+	private Instrument instrument;
 
-	public Note(int executionIndex, int pitchIndex, int rowIndex, Instrument instrument, Element element) {
-		this.executionIndex = executionIndex;
+	public Note(int delayTicks, int pitchIndex) {
+		this(delayTicks, pitchIndex, null);
+	}
+
+	public Note(int delayTicks, int pitchIndex, Integer songIndex) {
+		this(delayTicks, pitchIndex, songIndex, null);
+	}
+
+	public Note(int delayTicks, int pitchIndex, Integer songIndex, Element element) {
+		this(delayTicks, pitchIndex, songIndex, element, null);
+	}
+
+	public Note(int delayTicks, int pitchIndex, Integer songIndex, Element element, Instrument instrument) {
+		this.delayTicks = delayTicks;
 		this.pitchIndex = pitchIndex;
-		this.rowIndex = rowIndex;
-		this.instrument = instrument;
+		this.songIndex = songIndex;
 		this.element = element;
+		this.instrument = instrument;
 	}
 
 	private Note(NbtCompound nbt) {
-		this.executionIndex = nbt.getInt("ExecutionIndex");
+		this.delayTicks = nbt.getInt("DelayTicks");
 		this.pitchIndex = nbt.getInt("PitchIndex");
-		this.rowIndex = nbt.getInt("RowIndex");
+		if (nbt.contains("SongIndex")) {
+			this.songIndex = nbt.getInt("SongIndex");
+		}
 		if (nbt.contains("Instrument")) {
 			this.instrument = Instrument.values()[nbt.getInt("Instrument")];
 		}
 		if (nbt.contains("Element")) {
 			this.element = Element.values()[nbt.getInt("Element")];
 		}
+	}
+
+	public int getDelay() {
+		return this.delayTicks;
 	}
 
 	public float getPitch() {
@@ -38,14 +58,20 @@ public class Note {
 		return this.pitchIndex;
 	}
 
+	public Integer getSongIndex() {
+		return this.songIndex;
+	}
+
 	public Instrument getInstrument() {
 		return this.instrument;
 	}
 
 	public NbtCompound writeNbt(NbtCompound nbt) {
-		nbt.putInt("ExecutionIndex", this.executionIndex);
+		nbt.putInt("DelayTicks", this.delayTicks);
 		nbt.putInt("PitchIndex", this.pitchIndex);
-		nbt.putInt("RowIndex", this.rowIndex);
+		if (this.songIndex != null) {
+			nbt.putInt("SongIndex", this.songIndex);
+		}
 		nbt.putInt("Instrument", this.instrument.ordinal());
 		nbt.putInt("Element", this.element.ordinal());
 		return nbt;
