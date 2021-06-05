@@ -1,49 +1,35 @@
 package dev.fulmineo.elemancy.data;
 
-import net.minecraft.block.enums.Instrument;
 import net.minecraft.nbt.NbtCompound;
 
 public class Note {
 	private int delayTicks;
 	private int pitchIndex;
-	// TODO: Replace the various properties with this one!
-	// private NoteAction action;
-	private Integer songIndex;
-	private Element element;
-	private Instrument instrument;
+	private int currentTicks;
+	public NoteAction action;
 
 	public Note(int delayTicks, int pitchIndex) {
 		this(delayTicks, pitchIndex, null);
 	}
 
-	public Note(int delayTicks, int pitchIndex, Integer songIndex) {
-		this(delayTicks, pitchIndex, songIndex, null);
-	}
-
-	public Note(int delayTicks, int pitchIndex, Integer songIndex, Element element) {
-		this(delayTicks, pitchIndex, songIndex, element, null);
-	}
-
-	public Note(int delayTicks, int pitchIndex, Integer songIndex, Element element, Instrument instrument) {
+	public Note(int delayTicks, int pitchIndex, NoteAction action) {
 		this.delayTicks = delayTicks;
 		this.pitchIndex = pitchIndex;
-		this.songIndex = songIndex;
-		this.element = element;
-		this.instrument = instrument;
+		this.action = action;
 	}
 
 	private Note(NbtCompound nbt) {
 		this.delayTicks = nbt.getInt("DelayTicks");
 		this.pitchIndex = nbt.getInt("PitchIndex");
-		if (nbt.contains("SongIndex")) {
-			this.songIndex = nbt.getInt("SongIndex");
-		}
-		if (nbt.contains("Instrument")) {
-			this.instrument = Instrument.values()[nbt.getInt("Instrument")];
-		}
-		if (nbt.contains("Element")) {
-			this.element = Element.values()[nbt.getInt("Element")];
-		}
+		this.action = NoteAction.fromNbt(nbt);
+	}
+
+	public boolean hasRemainingTicks() {
+		return this.delayTicks > this.currentTicks;
+	}
+
+	public void tick() {
+		this.currentTicks++;
 	}
 
 	public int getDelay() {
@@ -58,22 +44,12 @@ public class Note {
 		return this.pitchIndex;
 	}
 
-	public Integer getSongIndex() {
-		return this.songIndex;
-	}
-
-	public Instrument getInstrument() {
-		return this.instrument;
-	}
-
 	public NbtCompound writeNbt(NbtCompound nbt) {
 		nbt.putInt("DelayTicks", this.delayTicks);
 		nbt.putInt("PitchIndex", this.pitchIndex);
-		if (this.songIndex != null) {
-			nbt.putInt("SongIndex", this.songIndex);
+		if (this.action != null){
+			nbt.put("Action", this.action.writeNbt(new NbtCompound()));
 		}
-		nbt.putInt("Instrument", this.instrument.ordinal());
-		nbt.putInt("Element", this.element.ordinal());
 		return nbt;
 	}
 

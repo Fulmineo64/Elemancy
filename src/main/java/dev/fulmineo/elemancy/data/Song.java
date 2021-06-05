@@ -2,17 +2,12 @@ package dev.fulmineo.elemancy.data;
 
 import java.util.List;
 
-import dev.fulmineo.elemancy.Elemancy;
-import dev.fulmineo.elemancy.item.AbstractBell;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 
 public class Song {
 	public List<Note> notes;
-	public int delayTicks;
 	public int noteIndex;
 	public boolean done;
 	public Song previous;
@@ -33,57 +28,17 @@ public class Song {
 	}
 
 	public void reset() {
-		this.delayTicks = 0;
 		this.noteIndex = 0;
 		this.previous = null;
 	}
 
-	public Song tick(Entity user, ItemStack bellItemStack, boolean handleDelay) {
-		if (this.done) {
-			return null;
-		} else {
-			Elemancy.info("message");
-			Note note = this.getNextNote();
-			if (handleDelay) {
-				if (note == null) {
-					this.delayTicks++;
-				} else {
-					this.delayTicks = 0;
-				}
-			}
-			// TODO: Double the mana cost for each note played on the same tick, this should persist between song. The act of changing a song should not be doubled.
-			while (note != null) {
-				AbstractBell bell = ((AbstractBell)bellItemStack.getItem());
-				bell.playNote(user, note);
-				Integer songIndex = note.getSongIndex();
-				if (songIndex != null) {
-					Song song = bell.getSongs(bellItemStack.getOrCreateTag()).get(songIndex);
-					if (song != null) {
-						song.previous = this;
-						return song.tick(user, bellItemStack, false);
-					}
-				}
-				note = this.getNextNote();
-			}
-			if (this.done ) {
-				return this.previous != null ? this.previous.tick(user, bellItemStack, false) : null;
-			} else {
-				return this;
-			}
-		}
+	public Note getNote() {
+		if (this.noteIndex == this.notes.size()) return null;
+		return this.notes.get(this.noteIndex);
 	}
 
-	public Note getNextNote() {
-		if (!this.done){
-			Note note = this.notes.get(this.noteIndex);
-			if (note.getDelay() == this.delayTicks) {
-				Elemancy.info("note="+note.getPitchIndex());
-				this.noteIndex++;
-				this.done = this.noteIndex == this.notes.size();
-				return note;
-			}
-		}
-		return null;
+	public void nextNote(){
+		this.noteIndex++;
 	}
 
 	public NbtCompound writeNbt(NbtCompound nbt) {

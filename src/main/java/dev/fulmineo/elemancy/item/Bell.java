@@ -21,10 +21,10 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public abstract class AbstractBell extends Item {
+public abstract class Bell extends Item {
 	protected Instrument defaultInstrument;
 
-	public AbstractBell(Settings settings, Instrument defaultInstrument) {
+	public Bell(Settings settings, Instrument defaultInstrument) {
         super(settings);
 		this.defaultInstrument = defaultInstrument;
     }
@@ -40,14 +40,9 @@ public abstract class AbstractBell extends Item {
         return TypedActionResult.success(itemStack);
     }
 
-	public void playNote(Entity user, Note note){
+	public void playNote(Entity user, Note note, Instrument instrument){
 		if (note.getPitchIndex() == 0) return;
 		BlockPos pos = user.getBlockPos();
-		// TODO: This should be available only on the cacophonous bell
-		Instrument instrument = note.getInstrument();
-		if (instrument == null) {
-			instrument = this.defaultInstrument;
-		}
 		user.world.playSound(null, pos, instrument.getSound(), SoundCategory.PLAYERS, 3.0F, note.getPitch());
 		// world.addParticle(ParticleTypes.NOTE, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.2D, (double)pos.getZ() + 0.5D, (double)note.getPitchIndex() / 24.0D, 0.0D, 0.0D);
 	}
