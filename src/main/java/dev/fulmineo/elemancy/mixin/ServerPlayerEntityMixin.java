@@ -39,4 +39,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements El
 	public void stopPlayingSong() {
 		this.elemancySongMangager.stop();
 	}
+
+	public ElemancySongManager getSongManager() {
+		return this.elemancySongMangager;
+	}
 }

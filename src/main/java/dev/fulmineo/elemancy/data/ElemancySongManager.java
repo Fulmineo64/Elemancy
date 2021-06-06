@@ -1,16 +1,19 @@
 package dev.fulmineo.elemancy.data;
 
+import java.util.List;
+
 import dev.fulmineo.elemancy.Elemancy;
 import dev.fulmineo.elemancy.item.Bell;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.Vec3d;
 
 public class ElemancySongManager {
 	private ItemStack bellStack;
 	private Song song;
 	private PlayerEntity player;
-
+	private List<Vec3d> controlledRelativePos;
 
 	public ElemancySongManager(PlayerEntity player){
 		this.player = player;
@@ -67,6 +70,9 @@ public class ElemancySongManager {
 					}
 					break;
 				}
+				case ADD: {
+					this.controlledRelativePos.add(new Vec3d(0, 0, 0));
+				}
 			}
 		}
 		note = this.getNote();
@@ -95,5 +101,9 @@ public class ElemancySongManager {
 	public void stop() {
 		this.bellStack = null;
 		this.song = null;
+	}
+
+	public boolean isActive(){
+		return this.song != null;
 	}
 }
