@@ -19,7 +19,7 @@ public class BoneBell extends Bell {
 		List<Song> songs = new ArrayList<>();
 		songs.add(new Song(
 			Arrays.asList(
-				new Note(0, 2),
+				new Note(0, 2, new NoteAction(NoteAction.Type.ADD, 0)),
 				new Note(2, 4),
 				new Note(2, 0, new NoteAction(NoteAction.Type.SONG, 1)),
 				new Note(2, 10)

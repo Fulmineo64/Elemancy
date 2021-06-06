@@ -1,9 +1,10 @@
 package dev.fulmineo.elemancy.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import dev.fulmineo.elemancy.Elemancy;
 import dev.fulmineo.elemancy.item.Bell;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
@@ -13,10 +14,10 @@ public class ElemancySongManager {
 	private ItemStack bellStack;
 	private Song song;
 	private PlayerEntity player;
-	private List<Vec3d> controlledRelativePos;
+	private List<Vec3d> controlledRelativePos = new ArrayList<Vec3d>();
 
-	public ElemancySongManager(PlayerEntity player){
-		this.player = player;
+	public ElemancySongManager(LivingEntity player){
+		this.player = (PlayerEntity)player;
 	}
 
 	public void tick() {
@@ -37,7 +38,10 @@ public class ElemancySongManager {
 	}
 
 	private Note getNote() {
-		if (this.song == null) return null;
+		if (this.song == null) {
+			this.stop();
+			return null;
+		}
 		Note note = this.song.getNote();
 		if (note == null) {
 			this.song = this.song.previous;
@@ -51,7 +55,6 @@ public class ElemancySongManager {
 		this.song.nextNote();
 		this.playNote(note);
 		if (note.action != null){
-			// TODO
 			switch (note.action.getType()) {
 				case ELEMENT: {
 					break;
@@ -82,7 +85,6 @@ public class ElemancySongManager {
 	}
 
 	private void playNote(Note note){
-		Elemancy.info("note = "+note.getPitchIndex()+" tick = "+this.player.world.getTime());
 		if (note.getPitchIndex() > 0){
 			Bell bell = this.getBell();
 			bell.playNote(this.player, note, bell.getCurrentInstrument());
@@ -93,6 +95,10 @@ public class ElemancySongManager {
 		return ((Bell)this.bellStack.getItem());
 	}
 
+	public List<Vec3d> getRelativePos() {
+		return this.controlledRelativePos;
+	}
+
 	public void play(ItemStack bellStack, int songIndex) {
 		this.bellStack = bellStack;
 		this.song = ((Bell)this.bellStack.getItem()).getSongs(this.bellStack.getOrCreateTag()).get(songIndex);
@@ -101,6 +107,7 @@ public class ElemancySongManager {
 	public void stop() {
 		this.bellStack = null;
 		this.song = null;
+		this.controlledRelativePos.clear();
 	}
 
 	public boolean isActive(){

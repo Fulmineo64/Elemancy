@@ -1,5 +1,7 @@
 package dev.fulmineo.elemancy.client.render;
 
+import dev.fulmineo.elemancy.data.ElemancyPlayerEntity;
+import dev.fulmineo.elemancy.data.ElemancySongManager;
 import dev.fulmineo.elemancy.mixin.WorldRendererAccessor;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
@@ -17,34 +19,37 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 
 // Many thanks to https://github.com/rwilliaise/schmucks for this part
+// https://github.com/rwilliaise/schmucks/blob/879c0e56df1c1ac4729432dffd5b6dda9b54eb22/src/main/java/com/alotofletters/schmucks/client/render/ControlWandWhitelistRenderer.java#L29
 
 public class OutlineRenderer {
 	public static boolean onBlockOutline(WorldRenderContext worldRenderContext, HitResult result) {
-		ClientWorld world = worldRenderContext.world();
 		MinecraftClient instance = MinecraftClient.getInstance();
         ClientPlayerEntity player = instance.player;
-		if (world.getTime() % 5 == 0) {
-			// TODO: rendered the ouline white of the placeholders blocks
-			// https://github.com/rwilliaise/schmucks/blob/879c0e56df1c1ac4729432dffd5b6dda9b54eb22/src/main/java/com/alotofletters/schmucks/client/render/ControlWandWhitelistRenderer.java#L29
-		}
-		BlockPos pos = player.getBlockPos();
 
-		WorldRendererAccessor accessor = (WorldRendererAccessor) worldRenderContext.worldRenderer();
-        BufferBuilderStorage storage = accessor.getBufferBuilders();
-        VertexConsumerProvider.Immediate immediate = storage.getEntityVertexConsumers();
-		VertexConsumer consumer = immediate.getBuffer(RenderLayer.getLines());
-		Vec3d cameraPos = worldRenderContext.camera().getPos();
-        float shade = (float) ((Math.sin(Math.toRadians((world.getTime() + worldRenderContext.tickDelta()) * 15)) + 1) * 0.5);
+		ElemancySongManager songManager = ((ElemancyPlayerEntity)player).getSongManager();
+		if (songManager.isActive()){
+			ClientWorld world = worldRenderContext.world();
 
-		VoxelShape shape = VoxelShapes.fullCube();
+			WorldRendererAccessor accessor = (WorldRendererAccessor) worldRenderContext.worldRenderer();
+			BufferBuilderStorage storage = accessor.getBufferBuilders();
+			VertexConsumerProvider.Immediate immediate = storage.getEntityVertexConsumers();
+			VertexConsumer consumer = immediate.getBuffer(RenderLayer.getLines());
+			Vec3d cameraPos = worldRenderContext.camera().getPos();
+			float shade = (float) ((Math.sin(Math.toRadians((world.getTime() + worldRenderContext.tickDelta()) * 15)) + 1) * 0.5);
 
-		double x = pos.getX() - cameraPos.getX();
-		double y = pos.getY() - cameraPos.getY();
-		double z = pos.getZ() - cameraPos.getZ();
-		worldRenderContext.matrixStack().push();
-		worldRenderContext.matrixStack().translate(x, y, z);
-		shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) ->
-				WorldRenderer.drawBox(worldRenderContext.matrixStack(),
+			VoxelShape shape = VoxelShapes.fullCube();
+
+			for (Vec3d relativePos : songManager.getRelativePos()){
+				BlockPos pos = player.getBlockPos();
+				pos.add(relativePos.x, relativePos.y, relativePos.z);
+				double x = pos.getX() - cameraPos.getX();
+				double y = pos.getY() - cameraPos.getY();
+				double z = pos.getZ() - cameraPos.getZ();
+				worldRenderContext.matrixStack().push();
+				worldRenderContext.matrixStack().translate(x, y, z);
+				shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) ->
+					WorldRenderer.drawBox(
+						worldRenderContext.matrixStack(),
 						consumer,
 						minX,
 						minY,
@@ -55,9 +60,12 @@ public class OutlineRenderer {
 						1,
 						1,
 						1,
-						shade));
-		worldRenderContext.matrixStack().pop();
-
+						shade
+					)
+				);
+				worldRenderContext.matrixStack().pop();
+			}
+		}
 		return true;
 	}
 
