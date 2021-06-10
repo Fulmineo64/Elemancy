@@ -2,12 +2,10 @@ package dev.fulmineo.elemancy.data;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.math.Direction;
 
 public class NoteAction {
 	private Type type;
 	private int value;
-	private Direction direction;
 
 	public NoteAction(Type type, int value) {
 		this.type = type;
@@ -22,20 +20,12 @@ public class NoteAction {
 		this.value = value;
 	}
 
-	public void setDirection(Direction direction){
-		this.direction = direction;
-	}
-
 	public Type getType(){
 		return this.type;
 	}
 
 	public int getValue(){
 		return this.value;
-	}
-
-	public Direction setDirection(){
-		return this.direction;
 	}
 
 	public NbtCompound writeNbt(NbtCompound nbt) {
@@ -57,8 +47,10 @@ public class NoteAction {
 		ELEMENT,
 		INSTRUMENT,
 		SONG,
+		DIRECTION_TYPE,
+		DIRECTION,
+		MOVE,
 		ADD,
-		REMOVE,
-		EXTEND
+		REMOVE
 	}
 }

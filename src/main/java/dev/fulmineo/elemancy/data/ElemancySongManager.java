@@ -3,11 +3,13 @@ package dev.fulmineo.elemancy.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.fulmineo.elemancy.Elemancy;
 import dev.fulmineo.elemancy.item.Bell;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 public class ElemancySongManager {
@@ -15,6 +17,9 @@ public class ElemancySongManager {
 	private Song song;
 	private PlayerEntity player;
 	private List<Vec3d> controlledRelativePos = new ArrayList<Vec3d>();
+	private DirectionType directionType;
+	private Direction direction;
+	private Vec3d offset = Vec3d.ZERO;
 
 	public ElemancySongManager(LivingEntity player){
 		this.player = (PlayerEntity)player;
@@ -55,6 +60,7 @@ public class ElemancySongManager {
 		this.song.nextNote();
 		this.playNote(note);
 		if (note.action != null){
+			int value = note.action.getValue();
 			switch (note.action.getType()) {
 				case ELEMENT: {
 					break;
@@ -63,18 +69,31 @@ public class ElemancySongManager {
 					break;
 				}
 				case SONG: {
-					Integer songIndex = note.action.getValue();
-					if (songIndex != null) {
-						Song song = this.getBell().getSongs(this.bellStack.getOrCreateTag()).get(songIndex);
-						if (song != null) {
-							song.previous = this.song;
-							this.song = song;
-						}
+					Song song = this.getBell().getSongs(this.bellStack.getOrCreateTag()).get(value);
+					if (song != null) {
+						song.previous = this.song;
+						this.song = song;
 					}
 					break;
 				}
 				case ADD: {
-					this.controlledRelativePos.add(new Vec3d(0, 0, 0));
+					for (int i = 0; i < value; i++){
+						this.controlledRelativePos.add(this.offset);
+						this.move(1);
+					}
+					break;
+				}
+				case DIRECTION_TYPE: {
+					this.directionType = DirectionType.values()[value];
+					break;
+				}
+				case DIRECTION: {
+					this.direction = Directions.values()[value].getDirection(player);
+					break;
+				}
+				case MOVE: {
+					this.move(value);
+					break;
 				}
 			}
 		}
@@ -82,6 +101,10 @@ public class ElemancySongManager {
 		if (note != null) {
 			this.handleNote(note);
 		}
+	}
+
+	private void move(int value) {
+		this.offset = this.offset.add((double)(this.direction.getOffsetX() * value), (double)(this.direction.getOffsetY() * value), (double)(this.direction.getOffsetZ() * value));
 	}
 
 	private void playNote(Note note){
@@ -99,14 +122,26 @@ public class ElemancySongManager {
 		return this.controlledRelativePos;
 	}
 
+	public Direction getDirection() {
+		return this.direction;
+	}
+
+	public DirectionType getDirectionType() {
+		return this.directionType;
+	}
+
 	public void play(ItemStack bellStack, int songIndex) {
+		this.stop();
 		this.bellStack = bellStack;
 		this.song = ((Bell)this.bellStack.getItem()).getSongs(this.bellStack.getOrCreateTag()).get(songIndex);
+		this.direction = player.getHorizontalFacing();
 	}
 
 	public void stop() {
 		this.bellStack = null;
 		this.song = null;
+		this.direction = null;
+		this.offset = Vec3d.ZERO;
 		this.controlledRelativePos.clear();
 	}
 

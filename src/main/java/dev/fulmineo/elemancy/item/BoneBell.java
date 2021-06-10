@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import dev.fulmineo.elemancy.data.DirectionType;
 import dev.fulmineo.elemancy.data.Note;
 import dev.fulmineo.elemancy.data.NoteAction;
 import dev.fulmineo.elemancy.data.Song;
@@ -19,16 +20,17 @@ public class BoneBell extends Bell {
 		List<Song> songs = new ArrayList<>();
 		songs.add(new Song(
 			Arrays.asList(
-				new Note(0, 2, new NoteAction(NoteAction.Type.ADD, 0)),
-				new Note(2, 4),
-				new Note(2, 0, new NoteAction(NoteAction.Type.SONG, 1)),
-				new Note(2, 10)
+				new Note(0, 2, new NoteAction(NoteAction.Type.DIRECTION_TYPE, DirectionType.DYNAMIC.ordinal())),
+				new Note(4, 4, new NoteAction(NoteAction.Type.ADD, 1)),
+				new Note(4, 0, new NoteAction(NoteAction.Type.SONG, 1)),
+				new Note(4, 10, new NoteAction(NoteAction.Type.ADD, 1)),
+				new Note(20000, 12)
 			)
 		));
 		songs.add(new Song(
 			Arrays.asList(
-				new Note(0, 6),
-				new Note(2, 8)
+				new Note(0, 6, new NoteAction(NoteAction.Type.ADD, 1)),
+				new Note(4, 8, new NoteAction(NoteAction.Type.ADD, 1))
 			)
 		));
 		return songs;
