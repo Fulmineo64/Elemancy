@@ -6,13 +6,13 @@ public class Note {
 	private int delayTicks;
 	private int pitchIndex;
 	private int currentTicks;
-	public NoteAction action;
+	public Action action;
 
 	public Note(int delayTicks, int pitchIndex) {
 		this(delayTicks, pitchIndex, null);
 	}
 
-	public Note(int delayTicks, int pitchIndex, NoteAction action) {
+	public Note(int delayTicks, int pitchIndex, Action action) {
 		this.delayTicks = delayTicks;
 		this.pitchIndex = pitchIndex;
 		this.action = action;
@@ -21,7 +21,7 @@ public class Note {
 	private Note(NbtCompound nbt) {
 		this.delayTicks = nbt.getInt("DelayTicks");
 		this.pitchIndex = nbt.getInt("PitchIndex");
-		this.action = NoteAction.fromNbt(nbt);
+		this.action = Action.fromNbt(nbt);
 	}
 
 	public boolean hasRemainingTicks() {

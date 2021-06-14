@@ -1,7 +1,7 @@
 package dev.fulmineo.elemancy.client.render;
 
-import dev.fulmineo.elemancy.Elemancy;
-import dev.fulmineo.elemancy.data.DirectionType;
+import java.util.List;
+
 import dev.fulmineo.elemancy.data.ElemancyPlayerEntity;
 import dev.fulmineo.elemancy.data.ElemancySongManager;
 import dev.fulmineo.elemancy.mixin.WorldRendererAccessor;
@@ -16,7 +16,6 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -41,32 +40,13 @@ public class OutlineRenderer {
 			float shade = (float) ((Math.sin(Math.toRadians((world.getTime() + worldRenderContext.tickDelta()) * 15)) + 1) * 0.5);
 
 			VoxelShape shape = VoxelShapes.fullCube();
-			BlockPos pos = player.getBlockPos();
-			Direction lookingDirection = player.getHorizontalFacing();
-			Direction managerDirection = songManager.getDirection();
-			DirectionType directionType = songManager.getDirectionType();
 
-			Elemancy.info(managerDirection.asString() + " " + managerDirection.asRotation() + " " + lookingDirection.asString() + " " + lookingDirection.asRotation());
+			List<BlockPos> positions = songManager.getPositions();
 
-			for (Vec3d relativePos : songManager.getRelativePos()){
-				BlockPos newPos;
-				if (directionType == DirectionType.DYNAMIC && managerDirection != lookingDirection) {
-					if (managerDirection.getAxis() == lookingDirection.getAxis()) {
-						newPos = pos.add(relativePos.x * -1, relativePos.y, relativePos.z * -1);
-					} else {
-						if (lookingDirection.asRotation() > managerDirection.asRotation()){
-							newPos = pos.add(relativePos.z * -1, relativePos.y, relativePos.x * -1);
-						} else {
-							newPos = pos.add(relativePos.z, relativePos.y, relativePos.x);
-						}
-					}
-				} else {
-					newPos = pos.add(relativePos.x, relativePos.y, relativePos.z);
-				}
-
-				double x = newPos.getX() - cameraPos.getX();
-				double y = newPos.getY() - cameraPos.getY();
-				double z = newPos.getZ() - cameraPos.getZ();
+			for (BlockPos pos : positions){
+				double x = pos.getX() - cameraPos.getX();
+				double y = pos.getY() - cameraPos.getY();
+				double z = pos.getZ() - cameraPos.getZ();
 				worldRenderContext.matrixStack().push();
 				worldRenderContext.matrixStack().translate(x, y, z);
 				shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) ->

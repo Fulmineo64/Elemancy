@@ -1,6 +1,5 @@
 package dev.fulmineo.elemancy.data;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Direction;
 
 public enum Directions {
@@ -11,25 +10,24 @@ public enum Directions {
 	LEFT,
 	RIGHT;
 
-	public Direction getDirection(PlayerEntity player){
+	public Direction getDirection(Direction startingDirection){
 		int index = this.ordinal();
 		Direction[] directions = Direction.values();
 		if (index < 2) {
 			return directions[index];
 		}
-		Direction facing = player.getHorizontalFacing();
 		switch (index) {
 			case 2: {
-				return facing;
+				return startingDirection;
 			}
 			case 3: {
-				return facing.rotateYCounterclockwise();
+				return startingDirection.getOpposite();
 			}
 			case 4: {
-				return facing.getOpposite();
+				return startingDirection.rotateYCounterclockwise();
 			}
 			case 5: {
-				return facing.rotateYClockwise();
+				return startingDirection.rotateYClockwise();
 			}
 		}
 		return null;
